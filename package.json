@@ -1,0 +1,18 @@
+{
+  "name": "alumnos",
+    "version": "1.0.0",
+    "description": "Proyecto final backend de alumnos",
+    "main": "index.js",
+    "scripts": {
+        "dev": "nodemon index.js"
+    },
+    
+  "dependencies": {
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.1",
+    "node": "^21.6.1",
+    "nodemon": "^3.0.3"
+  }
+}
