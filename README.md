@@ -9,7 +9,7 @@ Es mi primer proyecto desarrollando un Backend desde cero con ayuda de internet 
 
 ## Uso
 1. Ejecuta `node app.js` para iniciar la aplicación.
-2. Abre tu navegador y navega a `http://localhost:3000` para ver la aplicación en acción.
+2. Abre tu navegador y navega a `http://localhost:5000/api` para ver la aplicación en acción.
 
 ## Contribuir
 
