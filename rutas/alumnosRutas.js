@@ -1,5 +1,8 @@
 const express = require("express");
+const axios = require("axios");
 const Alumno = require("../models/alumnos");
+const alumnosController = express("../controllers/alumnosController");
+
 const alumnosRutas = express.Router();
 
 
@@ -13,22 +16,6 @@ alumnosRutas.get("/hora-mundial", async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Error al obtener la hora mundial" });
-    }
-});
-
-alumnosRutas.get("/", async (req, res) => {
-    try {
-        let alumnos = await Alumno.find({});
-        return res.status(200).send({
-            success: true,
-            alumnos,
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).send({
-            success: false,
-            message: "Error interno del servidor",
-        });
     }
 });
 
@@ -48,6 +35,7 @@ alumnosRutas.post("/alumno", async (req, res) => {
             surname,
             age,
         });
+        
 
         await alumno.save();
         return res.status(200).send({
