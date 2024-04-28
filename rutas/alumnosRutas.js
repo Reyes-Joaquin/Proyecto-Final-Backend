@@ -1,42 +1,44 @@
 const express = require("express");
 const axios = require("axios");
-const Alumno = require("../models/alumnos");
+const Alumno = require("../database/alumnos");
 const alumnosController = express("../controllers/alumnosController");
 
 const alumnosRutas = express.Router();
 
-
-alumnosRutas.get("/hora-mundial", async (req, res) => {
+alumnosRutas.get("/alumno/:id", async (req, res) => {
     try {
-        const response = await axios.get("https://www.timeapi.io/api/TimeZone/AvailableTimeZones");
+        const alumnoId = req.params.id;
 
-        const horaMundial = response.data.currentDateTime;
+        if (!alumnoId.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ success: false, message: "ID de alumno inválido" });
+        }
 
-        return res.status(200).json({ success: true, horaMundial });
+        const alumno = await Alumno.findById(alumnoId);
+
+        if (!alumno) {
+            return res.status(404).json({ success: false, message: "Alumno no encontrado" });
+        }
+
+        return res.status(200).json({ success: true, alumno });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success: false, message: "Error al obtener la hora mundial" });
+        return res.status(500).json({ success: false, message: "Error interno del servidor" });
     }
 });
 
 
-alumnosRutas.post("/alumno", async (req, res) => {
+alumnosRutas.post("/alumno", validateAlumno, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array() });
+    }
     try {
         const { name, surname, age } = req.body;
-        if (!name || !surname || !age) {
-            return res.status(400).send({
-                success: false,
-                message: "FALTAN DATOS POR COMPLETAR",
-            });
-        }
-
         let alumno = new Alumno({
             name,
             surname,
             age,
         });
-        
-
         await alumno.save();
         return res.status(200).send({
             success: true,
