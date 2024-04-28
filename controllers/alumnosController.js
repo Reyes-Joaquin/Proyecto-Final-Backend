@@ -1,4 +1,4 @@
-const Alumno = require("../models/alumnos");
+const Alumno = require("../database/alumnos");
 
 exports.obtenerAlumnos = async (req, res) => {
     try {
@@ -44,7 +44,6 @@ exports.crearAlumno = async (req, res) => {
         });
     }
 };
-
 
 exports.actualizarAlumno = async (req, res) => {
     try {
