@@ -1,18 +1,21 @@
 const express = require("express");
 const axios = require("axios");
-const Alumno = require("../database/alumnos");
-const alumnosController = express("../controllers/alumnosController");
+const Alumno = require("../models/alumnos"); // Cambio para utilizar el modelo correcto
+const alumnosController = require("../controllers/alumnosController"); // Cambio para importar el controlador correcto
 
 const alumnosRutas = express.Router();
 
-alumnosRutas.get("/alumno/:id", async (req, res) => {
+const validarID = (req, res, next) => {
+    const alumnoId = req.params.id;
+    if (!alumnoId.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.status(400).json({ success: false, message: "ID de alumno inválido" });
+    }
+    next();
+};
+
+alumnosRutas.get("/alumno/:id", validarID, async (req, res) => {
     try {
         const alumnoId = req.params.id;
-
-        if (!alumnoId.match(/^[0-9a-fA-F]{24}$/)) {
-            return res.status(400).json({ success: false, message: "ID de alumno inválido" });
-        }
-
         const alumno = await Alumno.findById(alumnoId);
 
         if (!alumno) {
@@ -25,7 +28,6 @@ alumnosRutas.get("/alumno/:id", async (req, res) => {
         return res.status(500).json({ success: false, message: "Error interno del servidor" });
     }
 });
-
 
 alumnosRutas.post("/alumno", validateAlumno, async (req, res) => {
     const errors = validationResult(req);
@@ -52,8 +54,7 @@ alumnosRutas.post("/alumno", validateAlumno, async (req, res) => {
     }
 });
 
-
-alumnosRutas.put("/alumno/:id", async (req, res) => {
+alumnosRutas.put("/alumno/:id", validarID, async (req, res) => {
     try {
         const { name, surname, age } = req.body;
         const alumnoId = req.params.id;
@@ -76,26 +77,12 @@ alumnosRutas.put("/alumno/:id", async (req, res) => {
 });
 
 
-alumnosRutas.delete("/alumno/:id", async (req, res) => {
-    try {
-        const alumnoId = req.params.id;
+alumnosRutas.get("/alumnos", alumnosController.obtenerAlumnos);
 
-        if (!alumnoId.match(/^[0-9a-fA-F]{24}$/)) {
-            return res.status(400).json({ success: false, message: "ID de alumno inválido" });
-        }
-        
-        const alumno = await Alumno.findByIdAndDelete(alumnoId);
+alumnosRutas.post("/alumno", alumnosController.crearAlumno);
 
-        if (!alumno) {
-            return res.status(404).json({ success: false, message: "Alumno no encontrado" });
-        }
+alumnosRutas.put("/alumno/:id", validarID, alumnosController.actualizarAlumno);
 
-        return res.status(200).json({ success: true, message: "Alumno eliminado correctamente" });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "Error interno del servidor" });
-    }
-});
-
+alumnosRutas.delete("/alumno/:id", validarID, alumnosController.eliminarAlumno);
 
 module.exports = alumnosRutas;
